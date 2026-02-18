@@ -1,35 +1,85 @@
 # routes.py
-import json
-from flask import render_template, request, jsonify, send_from_directory
-from memory.memory import save_memory
-from core.llm_client import LiteLLMClient
-from config import EMOJI_FOLDER
+
+import requests
+from flask import render_template, request, jsonify
 from datetime import datetime
-import os
 
-# Initialize the LiteLLM client
-llm_client = LiteLLMClient()
+from config import (
+    LM_STUDIO_URL,
+    API_KEY,
+    MODELS,
+    DEFAULT_MODEL,
+    MEMORY_FILE
+)
 
-# Memory Injection Route.
-injected_memory_store = {}  # key = session/user id, value = list of messages
+from memory.memory import save_memory
 
-def register_routes(app, conversation_history):
-    
-    @app.route("/")
-    def home():
-        emojis = []
-        if os.path.exists(EMOJI_FOLDER):
-            emojis = [f for f in os.listdir(EMOJI_FOLDER)
-                      if f.lower().endswith((".png", ".jpg", ".jpeg", ".svg"))]
-        return render_template(
-            "index.html",
-            conversation=conversation_history,
-            emojis=emojis
+
+# ----------------------------------
+# Smart Model Selection
+# ----------------------------------
+
+def smart_select_model(user_text: str) -> str:
+    text = user_text.lower().strip()
+
+    return DEFAULT_MODEL
+
+
+# ----------------------------------
+# LM Studio Query
+# ----------------------------------
+
+def query_lm_studio(user_text: str, model_key: str) -> str:
+    model_config = MODELS.get(model_key, MODELS[DEFAULT_MODEL])
+
+    payload = {
+        "model": model_config["model_name"],
+        "messages": [
+            {"role": "user", "content": user_text}
+        ],
+        "temperature": 0.7
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    if API_KEY:
+        headers["Authorization"] = f"Bearer {API_KEY}"
+
+    try:
+        response = requests.post(
+            LM_STUDIO_URL,
+            json=payload,
+            headers=headers,
+            timeout=180
         )
 
-    @app.route("/emojis/<filename>")
-    def serve_emoji(filename):
-        return send_from_directory(EMOJI_FOLDER, filename)
+        response.raise_for_status()
+        data = response.json()
+
+        if "choices" in data and len(data["choices"]) > 0:
+            return data["choices"][0]["message"]["content"]
+        else:
+            return "Model returned an empty response."
+
+    except Exception as e:
+        # Failover to default model if helper fails
+        if model_key != DEFAULT_MODEL:
+            return query_lm_studio(user_text, DEFAULT_MODEL)
+
+        return f"Error: Could not reach model {model_key}. {str(e)}"
+
+
+# ----------------------------------
+# Flask Routes
+# ----------------------------------
+
+def register_routes(app, conversation_history):
+
+    @app.route("/")
+    def index():
+        return render_template("index.html", conversation=conversation_history)
 
     @app.route("/chat", methods=["POST"])
     def chat():
@@ -37,7 +87,7 @@ def register_routes(app, conversation_history):
         user_text = data.get("text", "").strip()
         timestamp = datetime.now().isoformat()
 
-        # Append user message
+        # Store user message
         conversation_history.append({
             "role": "user",
             "content": user_text,
@@ -45,47 +95,18 @@ def register_routes(app, conversation_history):
         })
         save_memory(conversation_history)
 
-        injected_memory_text = "\n".join(
-            f"{msg['role'].capitalize()}: {msg['content']}"
-            for msg in conversation_history
-            if msg.get("injected")
-        )
-        if injected_memory_text:
-            user_text = f"{injected_memory_text}\n\n{user_text}"
-        else:
-            user_text = f"{user_text}"
+        # Determine model
+        model_key = smart_select_model(user_text)
 
-        # -------------------------------
-        # Build prompt & get response
-        # -------------------------------
-        response_text = llm_client.send_text(user_text)
+        # Query LM Studio
+        ai_response = query_lm_studio(user_text, model_key)
 
-        # Append AI response
+        # Store AI response
         conversation_history.append({
-            "role": "ai",
-            "content": response_text,
+            "role": "assistant",
+            "content": ai_response,
             "timestamp": timestamp
         })
         save_memory(conversation_history)
 
-        return jsonify({"response": response_text})
-    
-    @app.route("/inject_memory", methods=["POST"])
-    def inject_memory():
-        data = request.json
-        memory_to_inject = data.get("memory", [])
-
-        # Validate memory structure
-        if not isinstance(memory_to_inject, list):
-            return jsonify({"status": "Invalid format"}), 400
-        
-        # Mark messages as injected and append to conversation history
-        for msg in memory_to_inject:
-            if "role" in msg and "content" in msg:
-                msg["injected"] = True  # Mark as injected
-            else:
-                return jsonify({"status": "Invalid message format"}), 400
-
-        # Append temporarily to conversation (do not save permanently)
-        conversation_history.extend(memory_to_inject)
-        return jsonify({"status": "Memory injected successfully"})
+        return jsonify({"response": ai_response})

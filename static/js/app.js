@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnPrompts = document.getElementById("btnPrompts");
     const btnMemory = document.getElementById("btnMemory");
 
+    const drawerButtons = document.querySelectorAll(".drawer-btn");
+
     // Open drawer
     menuToggle.addEventListener("click", function () {
         drawer.classList.add("active");
@@ -93,7 +95,38 @@ document.addEventListener("DOMContentLoaded", function () {
     btnMemory.addEventListener("click", function () {
         console.log("Memory clicked");
     });
+    drawerButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const panel = document.getElementById(btn.dataset.target);
+            const isOpen = btn.classList.contains("active");
 
+            drawerButtons.forEach(b => {
+                b.classList.remove("active");
+                const p = document.getElementById(b.dataset.target);
+                p.style.display = "none";
+            });
+
+            if (!isOpen) {
+                btn.classList.add("active");
+                panel.style.display = "block";
+            }
+        });
+    });
+
+    // --- Dark Mode Toggle ---
+    const darkModeToggle = document.getElementById("darkModeToggle");
+
+    if (darkModeToggle) {
+        if (localStorage.getItem("eloriaDarkMode") === "true") {
+            document.body.classList.add("dark-mode");
+            darkModeToggle.checked = true;
+        }
+
+        darkModeToggle.addEventListener("change", () => {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("eloriaDarkMode", document.body.classList.contains("dark-mode"));
+        });
+    }
 });
 
 // ----------------------------
