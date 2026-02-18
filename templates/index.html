@@ -5,6 +5,8 @@
 <head>
     <title>Eloria AI Assistant</title>
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -103,10 +105,32 @@
 <!-- Slide Drawer -->
 <div id="sideDrawer" class="drawer">
     <h2>Eloria</h2>
-    <button onclick="openSettings()">⚙ Settings</button>
-    <button onclick="openHistory()">📜 History</button>
-    <button onclick="openPrompts()">💬 Prompts</button>
-    <button onclick="openMemory()">🧠 Memory</button>
+    <button id="menu-settings">⚙ Settings</button>
+    <div id="panel-settings" class="menu-panel">
+        <p>
+            <div class="setting-item">
+                <span>Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </p>
+    </div>
+    
+    <button id="menu-history">📜 History</button>
+    <div id="panel-history" class="menu-panel"><p>History window content...</p></div>
+    
+    <button id="menu-prompts">💬 Prompts</button>
+    <div id="panel-prompts" class="menu-panel"><p>Prompts window content...</p></div>
+    
+    <button id="menu-memory">🧠 Memory</button>
+    <div id="panel-memory" class="menu-panel"><p>Memory window content...</p></div>
+    
+    <button id="menu-debug">🐞 Debug</button>
+    <div id="panel-debug" class="menu-panel"><p>Debug window content...</p></div>
+
 </div>
+
 </body>
 </html>

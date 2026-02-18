@@ -1,0 +1,12 @@
+[
+  {
+    "role": "user",
+    "content": "Good morning Eloria.",
+    "timestamp": "2026-02-18T09:27:58.081693"
+  },
+  {
+    "role": "assistant",
+    "content": "Error: Could not reach model Eloria. 400 Client Error: Bad Request for url: http://localhost:1234/v1/chat/completions",
+    "timestamp": "2026-02-18T09:27:58.081693"
+  }
+]

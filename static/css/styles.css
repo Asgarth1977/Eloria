@@ -119,6 +119,30 @@
         z-index: 1001;
     }
 
+    .accordion-btn {
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #2c2c3e;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        border-radius: 4px;
+    }
+
+    /* Menu Panel */
+    .menu-panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background-color: #2c2c3e;
+        margin-bottom: 5px;
+        padding: 0 10px; /* padding will expand when max-height increases */
+        border-radius: 4px;
+    }
+
     /* Overlay */
     .overlay {
         position: fixed;
@@ -131,6 +155,12 @@
         visibility: hidden;
         transition: 0.3s;
         z-index: 1000;
+        display: none
+    }
+
+    /* Show overlay when active */
+    .overlay.show {
+        display: block;
     }
 
     /* Drawer */
@@ -138,19 +168,26 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 260px;
+        width: 250px;
         height: 100vh;
-        background: #1e1e1e;
+        background: #1e1e2f;
+        color: white;
         padding: 20px;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
-        z-index: 1002;
+        z-index: 1000;
         display: flex;
         flex-direction: column;
     }
 
+    /* Drawer Content */
+    .drawer.open {
+        transform: translateX(0);
+    }
+
     .drawer h2 {
         margin-bottom: 20px;
+        text-align: center;
     }
 
     .drawer button {
@@ -164,34 +201,34 @@
         transition: 0.2s;
     }
 
-.drawer button:hover {
-    background: #3a3a3a;
-}
+    .drawer button:hover {
+        background: #3a3a3a;
+    }
 
-/* Active State */
-.drawer.active {
-    transform: translateX(0);
-}
+    /* Active State */
+    .drawer.active {
+        transform: translateX(0);
+    }
 
-.overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
+    .overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
 
-body.drawer-open {
-    overflow: hidden;
-}
+    body.drawer-open {
+        overflow: hidden;
+    }
 
-.drawer-panel {
-  display: none; /* Hidden by default */
-  padding: 10px 15px;
-  background-color: var(--input-bg);
-  border-top: 1px solid #ccc;
-}
+    .drawer-panel {
+        display: none; /* Hidden by default */
+        padding: 10px 15px;
+        background-color: var(--input-bg);
+        border-top: 1px solid #ccc;
+    }
 
-.drawer-btn.active + .drawer-panel {
-  display: block; /* Show panel when button is active */
-}
+    .drawer-btn.active + .drawer-panel {
+        display: block; /* Show panel when button is active */
+    }
 
 
 /* Splash Screen */
@@ -304,4 +341,70 @@ body.drawer-open {
             0 0 30px #00ff00,
             0 0 50px #00ff00;
     }
+}
+
+    /* Dark Mode styles */
+    body.dark-mode {
+        background-color: #1a1a28;
+        color: #e0e0e0;
+    }
+
+    /* Optional: invert drawer colors for dark mode */
+    body.dark-mode .drawer {
+        background-color: #12121f;
+        color: #fff;
+    }
+
+.setting-item {
+    display: flex;
+    justify-content: space-between; /* pushes text left, toggle right */
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Toggle container remains mostly the same */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px; /* increased from 60px to fit right icon */
+    height: 24px;
+}
+
+/* Hide checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+/* Checked state */
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
 }
