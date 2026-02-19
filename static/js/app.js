@@ -1,138 +1,131 @@
-/*
-    Main app.js file.
-*/
+function formatTimestamp(ts) {
+    const dt = new Date(ts);
+    if (Number.isNaN(dt.getTime())) return "";
+    return dt.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
 
-// app.js
+function addMessage(text, sender, timestamp) {
+    const chat = document.getElementById("chat");
+    const div = document.createElement("div");
+    div.className = `bubble ${sender}`;
+    div.textContent = text;
+
+    const ts = document.createElement("div");
+    ts.className = "timestamp";
+    ts.textContent = formatTimestamp(timestamp);
+
+    div.appendChild(ts);
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+window.addMessage = addMessage;
 
 document.addEventListener("DOMContentLoaded", () => {
-    const attachBtn = document.getElementById("attach-btn");
-    const fileInput = document.getElementById("attach-input");
-
-    if (!attachBtn || !fileInput) {
-        console.error("Attach button or file input missing!");
-        return;
-    }
-
-    // When + button is clicked, open the hidden file input
-    attachBtn.onclick = () => {
-        fileInput.click();
-    };
-
-    // Handle file selection
-    fileInput.onchange = async (e) => {
-        if (!e.target.files.length) return;
-
-        const file = e.target.files[0];
-
-        try {
-            const text = await file.text();
-            const data = JSON.parse(text);
-
-            if (!Array.isArray(data)) {
-                alert("Invalid memory file format.");
-                return;
-            }
-
-            // Send to backend for injection
-            const res = await fetch("/inject_memory", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ memory: data })
-            });
-
-            const result = await res.json();
-            alert(result.status);
-
-            // Clear input value so the same file can be selected again
-            fileInput.value = "";
-        } catch (err) {
-            console.error(err);
-            alert("Failed to read or parse file.");
-        }
-    };
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const sendBtn = document.getElementById("send");
     const menuToggle = document.getElementById("menuToggle");
     const drawer = document.getElementById("sideDrawer");
-    const overlay = document.getElementById("overlay");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const attachBtn = document.getElementById("attach-btn");
+    const attachInput = document.getElementById("attach-input");
+    const newChatBtn = document.getElementById("newChatBtn");
 
-    const btnSettings = document.getElementById("btnSettings");
-    const btnHistory = document.getElementById("btnHistory");
-    const btnPrompts = document.getElementById("btnPrompts");
-    const btnMemory = document.getElementById("btnMemory");
+    function loadConversation() {
+        const node = document.getElementById("conversationData");
+        if (!node?.textContent) return;
+        const conversation = JSON.parse(node.textContent);
+        for (const msg of conversation) {
+            addMessage(msg.content, msg.role === "user" ? "user" : "ai", msg.timestamp);
+        }
+    }
 
-    const drawerButtons = document.querySelectorAll(".drawer-btn");
+    async function sendMessage() {
+        const text = input.innerText.trim();
+        if (!text) return;
 
-    // Open drawer
-    menuToggle.addEventListener("click", function () {
-        drawer.classList.add("active");
-        overlay.classList.add("active");
-        document.body.classList.add("drawer-open");
+        const now = new Date().toISOString();
+        addMessage(text, "user", now);
+        input.innerHTML = "";
+
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+
+        const data = await res.json();
+        addMessage(data.response, "ai", new Date().toISOString());
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     });
 
-    // Close drawer when clicking overlay
-    overlay.addEventListener("click", function () {
-        drawer.classList.remove("active");
-        overlay.classList.remove("active");
-        document.body.classList.remove("drawer-open");
-    });
+    menuToggle.addEventListener("click", () => drawer.classList.toggle("open"));
 
-    // Button actions
-    btnSettings.addEventListener("click", function () {
-        console.log("Settings clicked");
-    });
-
-    btnHistory.addEventListener("click", function () {
-        console.log("History clicked");
-    });
-
-    btnPrompts.addEventListener("click", function () {
-        console.log("Prompts clicked");
-    });
-
-    btnMemory.addEventListener("click", function () {
-        console.log("Memory clicked");
-    });
-    drawerButtons.forEach(btn => {
+    document.querySelectorAll(".sidebar-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
-            const panel = document.getElementById(btn.dataset.target);
-            const isOpen = btn.classList.contains("active");
-
-            drawerButtons.forEach(b => {
-                b.classList.remove("active");
-                const p = document.getElementById(b.dataset.target);
-                p.style.display = "none";
+            const section = btn.id.replace("menu-", "panel-");
+            document.querySelectorAll(".menu-panel").forEach((panel) => {
+                if (panel.id === section) panel.classList.toggle("open");
+                else panel.classList.remove("open");
             });
-
-            if (!isOpen) {
-                btn.classList.add("active");
-                panel.style.display = "block";
-            }
         });
     });
 
-    // --- Dark Mode Toggle ---
-    const darkModeToggle = document.getElementById("darkModeToggle");
+    const savedMode = localStorage.getItem("eloriaTheme") || "dark";
+    if (savedMode === "light") {
+        document.body.classList.add("light-mode");
+        darkModeToggle.checked = false;
+    }
+    darkModeToggle.addEventListener("change", () => {
+        const isDark = darkModeToggle.checked;
+        document.body.classList.toggle("light-mode", !isDark);
+        localStorage.setItem("eloriaTheme", isDark ? "dark" : "light");
+    });
 
-    if (darkModeToggle) {
-        if (localStorage.getItem("eloriaDarkMode") === "true") {
-            document.body.classList.add("dark-mode");
-            darkModeToggle.checked = true;
+    attachBtn.addEventListener("click", () => attachInput.click());
+    attachInput.addEventListener("change", async (e) => {
+        if (!e.target.files?.length) return;
+        const file = e.target.files[0];
+        const text = await file.text();
+        const payload = JSON.parse(text);
+        if (!Array.isArray(payload)) {
+            alert("Invalid memory JSON. Expected array of messages.");
+            return;
         }
 
-        darkModeToggle.addEventListener("change", () => {
-            document.body.classList.toggle("dark-mode");
-            localStorage.setItem("eloriaDarkMode", document.body.classList.contains("dark-mode"));
+        const res = await fetch("/inject_memory", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ memory: payload })
         });
-    }
+        const data = await res.json();
+        alert(data.status || data.error || "Done");
+        attachInput.value = "";
+    });
+
+    newChatBtn.addEventListener("click", () => {
+        chat.innerHTML = "";
+    });
+
+    loadConversation();
+    runStartupSplash();
 });
 
-// ----------------------------
-// Splash / Matrix Setup
-// ----------------------------
-document.addEventListener("DOMContentLoaded", () => {
+function runStartupSplash() {
     const splash = document.getElementById("startupSplash");
     const appDiv = document.getElementById("app");
     const canvas = document.getElementById("splashCanvas");
@@ -141,92 +134,52 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const columnWidth = 22; 
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()ｱｲｳｴｵｶｷｸｹｺﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝｦｧｨｩｪｫｯｬｭｮ日";
+    const columnWidth = 22;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
     const columns = Math.floor(canvas.width / columnWidth);
     const drops = Array(columns).fill(0);
-    const speeds = drops.map(() => Math.random() * 0.2 + 0.05); // slight variance
-    let matrixAnimationId;
-
+    const speeds = drops.map(() => Math.random() * 0.2 + 0.05);
     const progressBar = document.getElementById("loadingProgress");
     const startupText = document.getElementById("startupText");
-    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-
-    const timers = Array(columns).fill(0);
-    const chars = Array(columns).fill(text);
-    const changeRate = 25 + Math.floor(Math.random() * 10); // frames before character changes
 
     let progress = 0;
-    let finished = false;
+    let anim;
 
-    // ----------------------------
-    // Matrix draw
-    // ----------------------------
     function drawMatrix() {
-        ctx.fillStyle = "rgba(0,0,0,0.3)"; // trails
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = "20px monospace";
 
         for (let i = 0; i < drops.length; i++) {
-            timers[i]++;
-            if (timers[i] >= changeRate) {
-                chars[i] = letters.charAt(Math.floor(Math.random() * letters.length));
-                timers[i] = 0;
-            }
-
-            ctx.fillStyle = Math.random() > 0.975 ? "#AAF" : "#0F0";
-            ctx.fillText(chars[i], i * columnWidth, drops[i] * columnWidth);
-
-            if (drops[i] * columnWidth > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-
+            ctx.fillStyle = "#0F0";
+            const text = letters.charAt(Math.floor(Math.random() * letters.length));
+            ctx.fillText(text, i * columnWidth, drops[i] * columnWidth);
+            if (drops[i] * columnWidth > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i] += speeds[i];
         }
 
-        matrixAnimationId = requestAnimationFrame(drawMatrix);
+        anim = requestAnimationFrame(drawMatrix);
     }
-    drawMatrix();
 
-    // ----------------------------
-    // Progress bar simulation
-    // ----------------------------
     function updateProgress() {
-        if (finished) return;
+        progress += 0.7;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+        if (progress < 35) startupText.textContent = "Decrypting memory...";
+        else if (progress < 70) startupText.textContent = "Booting neural core...";
+        else startupText.textContent = "Establishing consciousness...";
 
-        progress += 0.1; // slow cinematic fill
-        if (progress >= 99.5) {
-            progress = 100;
-            finished = true;
-            progressBar.style.width = "100%";
+        if (progress >= 100) {
             startupText.textContent = "System Online";
-
-            setTimeout(appReady, 1600);
+            setTimeout(() => {
+                cancelAnimationFrame(anim);
+                splash.style.display = "none";
+                appDiv.style.display = "flex";
+            }, 400);
             return;
         }
-
-        progressBar.style.width = progress + "%";
-
-        if (progress > 25 && progress < 55) startupText.textContent = "Decrypting memory...";
-        else if (progress >= 55 && progress < 85) startupText.textContent = "Booting neural core...";
-        else if (progress >= 85) startupText.textContent = "Establishing consciousness...";
-
         requestAnimationFrame(updateProgress);
     }
+
+    drawMatrix();
     updateProgress();
-
-    // ----------------------------
-    // App ready
-    // ----------------------------
-    function appReady() {
-        if (matrixAnimationId) cancelAnimationFrame(matrixAnimationId);
-        if (canvas) canvas.remove();
-        splash.style.display = "none";
-        appDiv.style.display = "block";
-    }
-
-    window.addEventListener("resize", () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
-});
+}
