@@ -1,21 +1,21 @@
+# memory_watcher.py
 # Memory Watcher - Eloria AI Assistant
 
 import threading
 import time
 from datetime import datetime
-from memory.memory import load_memory, save_memory
 
 class MemoryWatcher:
     """
-    Watches the system clock and automatically creates a new memory file
-    when a new day starts. Keeps conversation_history updated.
+    Watches the system clock and automatically triggers
+    the MemoryManager to switch to a new day's memory.
     """
 
-    def __init__(self, conversation_history):
+    def __init__(self, memory_manager):
+        self.memory_manager = memory_manager
         self.current_date = datetime.now().date()
-        self.conversation_history = conversation_history
-        self.lock = threading.Lock()
         self.running = False
+        self.lock = threading.Lock()
 
     def start(self):
         self.running = True
@@ -30,12 +30,8 @@ class MemoryWatcher:
             time.sleep(30)  # Check every 30 seconds
             now = datetime.now().date()
             if now != self.current_date:
-                # Midnight passed, switch to new day's memory
                 with self.lock:
                     print(f"[MemoryWatcher] New day detected: {now}. Switching memory file.")
-                    # Save the previous day's memory
-                    save_memory(self.conversation_history)
-                    # Load new day's memory
-                    self.conversation_history.clear()
-                    self.conversation_history.extend(load_memory())
+                    # Let MemoryManager handle the new day
+                    self.memory_manager.start_new_day()
                     self.current_date = now

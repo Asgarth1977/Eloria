@@ -5,23 +5,24 @@ import threading
 import webview
 from flask import Flask
 from web.routes import register_routes
-from memory.memory import load_memory
-from memory.memory_watcher import MemoryWatcher
+from memory import memory_manager
+from memory.memory_manager import MemoryManager
+
 # -------------------------------
 # Flask app for Web UI
 # -------------------------------
 
 app = Flask(__name__)
 
-# Initialize conversation history and memory watcher
-conversation_history = load_memory()
-
-# Start memory watcher in a separate thread
-memory_watcher = MemoryWatcher(conversation_history)
-memory_watcher.start()
+# Conversation history is shared between Flask routes and MemoryManager
+# -------------------------------
+# Initialize MemoryManager & Watcher
+# -------------------------------
+memory_manager = MemoryManager()
+# MemoryWatcher is already started inside MemoryManager.__init__()
 
 # Register routes
-register_routes(app, conversation_history)
+register_routes(app, memory_manager)
 
 def start_flask():
     app.run(port=5000)

@@ -4,10 +4,11 @@
 <html>
 <head>
     <title>Eloria AI Assistant</title>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
-<script src="{{ url_for('static', filename='js/menu.js') }}"></script>
-<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+        <script src="{{ url_for('static', filename='js/memory.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
 
@@ -42,6 +43,17 @@
             const input = document.getElementById('input');
             const sendBtn = document.getElementById('send');
 
+        function formatTimestamp(ts) {
+            const dt = new Date(ts);
+            return dt.toLocaleString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+
         function addMessage(text, sender, timestamp){
             const div = document.createElement('div');
             div.className = 'bubble ' + sender;
@@ -49,7 +61,7 @@
 
             const ts = document.createElement('div');
             ts.className = 'timestamp';
-            ts.textContent = timestamp;
+            ts.textContent = formatTimestamp(timestamp);
 
             div.appendChild(ts);
             chat.appendChild(div);
@@ -64,7 +76,7 @@
             const text = getInputText().trim();
             if(!text) return;
 
-            const now = new Date().toLocaleTimeString();
+            const now = new Date().toISOString();
             addMessage(text, 'user', now);
             input.innerHTML = '';
 
@@ -75,7 +87,7 @@
             });
 
             const data = await res.json();
-            addMessage(data.response, 'ai', new Date().toLocaleTimeString());
+            addMessage(data.response, 'ai', new Date().toISOString());
         }
 
         sendBtn.addEventListener('click', sendMessage);
@@ -91,7 +103,7 @@
         const conversation = {{ conversation | default([]) | tojson | safe }};
             for (const msg of conversation) {
             const sender = msg.role === 'user' ? 'user' : 'ai';
-            addMessage(msg.content, sender, new Date(msg.timestamp).toLocaleTimeString());
+            addMessage(msg.content, sender, msg.timestamp);
         }
     });
 </script>
@@ -119,7 +131,12 @@
     </div>
     
     <button id="menu-history">📜 History</button>
-    <div id="panel-history" class="menu-panel"><p>History window content...</p></div>
+    <div id="panel-history" class="menu-panel">
+        <p>
+            <button id="load3Days">📅 Load Last 3 Days</button>
+            <button id="summarizeNow">📝 Summarize Conversation</button>
+        </p>
+    </div>
     
     <button id="menu-prompts">💬 Prompts</button>
     <div id="panel-prompts" class="menu-panel"><p>Prompts window content...</p></div>

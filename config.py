@@ -11,9 +11,8 @@ import os
 # -------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-MEMORY_FOLDER = os.path.join(BASE_DIR, "memory")
+MEMORY_FOLDER = os.path.join(BASE_DIR, "memory", "memories")
 os.makedirs(MEMORY_FOLDER, exist_ok=True)
-MEMORY_FILE = os.path.join(MEMORY_FOLDER, "conversation.json")
 
 # -------------------------------
 # LM Studio Settings

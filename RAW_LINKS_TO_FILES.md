@@ -24,6 +24,8 @@ memory.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/core
 2026-02-14.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/2026-02-14.json
 2026-02-15.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/2026-02-15.json
 2026-02-16.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/2026-02-16.json
+2026-02-17.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/2026-02-17.json
+2026-02-18.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/2026-02-18.json
 __init__.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/__init__.py
 memory_core.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory.py
 memory_watcher.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory_watcher.py
@@ -40,7 +42,7 @@ styles.css: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/sta
 
 # JS Folder (Eloria/static/js)
 app.js: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/static/js/app.js
-emoji.js: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/static/js/emoji.js
+menu.js: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/static/js/menu.js
 
 # Templates Folder (Eloria/templates)
 index.html: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/templates/index.html
