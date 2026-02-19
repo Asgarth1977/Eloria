@@ -1,4 +1,3 @@
-// memory.js
 document.addEventListener("DOMContentLoaded", () => {
     const loadBtn = document.getElementById("load3Days");
     const summarizeBtn = document.getElementById("summarizeNow");
@@ -8,11 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const res = await fetch("/load_3_days", { method: "POST" });
                 const data = await res.json();
-                console.log(data);
 
                 if (data.success && Array.isArray(data.messages) && data.messages.length) {
                     for (const msg of data.messages) {
-                        addMessage(msg.content, msg.role === "user" ? "user" : "ai", msg.timestamp);
+                        if (typeof window.addMessage === "function") {
+                            window.addMessage(msg.content, msg.role === "user" ? "user" : "ai", msg.timestamp);
+                        }
                     }
                 } else if (!data.success) {
                     alert("Error loading 3-day memory: " + data.error);

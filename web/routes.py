@@ -70,3 +70,23 @@ def register_routes(app, memory_manager: MemoryManager):
         ai_response = query_lm_studio(user_text, model_key)
         memory_manager.add_message("assistant", ai_response, timestamp)
         return jsonify({"response": ai_response})
+
+
+    @app.route("/inject_memory", methods=["POST"])
+    def inject_memory():
+        data = request.json or {}
+        memory = data.get("memory", [])
+        if not isinstance(memory, list):
+            return jsonify({"status": "error", "error": "Invalid payload: memory must be a list."}), 400
+        try:
+            for entry in memory:
+                if not isinstance(entry, dict):
+                    continue
+                role = entry.get("role", "user")
+                content = str(entry.get("content", "")).strip()
+                timestamp = entry.get("timestamp") or datetime.now().isoformat()
+                if content:
+                    memory_manager.add_message(role, content, timestamp)
+            return jsonify({"status": "Memory injected successfully."})
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 500

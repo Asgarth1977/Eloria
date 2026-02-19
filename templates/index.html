@@ -1,153 +1,68 @@
-<!-- Index.html file -->
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Eloria AI Assistant</title>
-        <script src="{{ url_for('static', filename='js/memory.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='js/memory.js') }}"></script>
 </head>
 <body>
-
-<!-- Startup Splash -->
-<div id="startupSplash">
-    <div id="splashContent">
-        <div id="startupText"> Booting Eloria... </div>
-        <div id="progressContainer">
-            <div id="loadingProgress"></div>
-        </div>
-    </div>
-    <!-- Animated background dots -->
-    <canvas id="splashCanvas"></canvas>
-</div>
-
-
-    <div id="chat"></div>
-
-    <!-- Input area -->
-    <input type="file" id="attach-input" style="display:none;" accept=".json">
-    <div id="input-area">
-        <button id="attach-btn" title="Attach memory file">
-            <img src="{{ url_for('static', filename='icons/plus_2795.png') }}" alt="+">
-        </button>
-        <div id="input" contenteditable="true" placeholder="Type a message..."></div>
-        <button id="send">Send</button>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chat = document.getElementById('chat');
-            const input = document.getElementById('input');
-            const sendBtn = document.getElementById('send');
-
-        function formatTimestamp(ts) {
-            const dt = new Date(ts);
-            return dt.toLocaleString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-
-        function addMessage(text, sender, timestamp){
-            const div = document.createElement('div');
-            div.className = 'bubble ' + sender;
-            div.textContent = text;
-
-            const ts = document.createElement('div');
-            ts.className = 'timestamp';
-            ts.textContent = formatTimestamp(timestamp);
-
-            div.appendChild(ts);
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function getInputText() {
-            return input.innerText;
-        }
-
-        async function sendMessage(){
-            const text = getInputText().trim();
-            if(!text) return;
-
-            const now = new Date().toISOString();
-            addMessage(text, 'user', now);
-            input.innerHTML = '';
-
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type':'application/json' },
-                body: JSON.stringify({ text })
-            });
-
-            const data = await res.json();
-            addMessage(data.response, 'ai', new Date().toISOString());
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // prevent newline
-                sendMessage();
-            }
-        });
-
-        // Load conversation history from Flask
-        const conversation = {{ conversation | default([]) | tojson | safe }};
-            for (const msg of conversation) {
-            const sender = msg.role === 'user' ? 'user' : 'ai';
-            addMessage(msg.content, sender, msg.timestamp);
-        }
-    });
-</script>
-
-    <!-- Menu Button -->
-<button id="menuToggle" class="menu-btn">☰</button>
-
-<!-- Overlay -->
-<div id="overlay" class="overlay"></div>
-
-<!-- Slide Drawer -->
-<div id="sideDrawer" class="drawer">
-    <h2>Eloria</h2>
-    <button id="menu-settings">⚙ Settings</button>
-    <div id="panel-settings" class="menu-panel">
-        <p>
-            <div class="setting-item">
-                <span>Dark Mode</span>
-                <label class="switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider round"></span>
-                </label>
+    <div id="startupSplash" aria-hidden="true">
+        <div id="splashContent">
+            <div id="startupText">Booting Eloria...</div>
+            <div id="progressContainer">
+                <div id="loadingProgress"></div>
             </div>
-        </p>
+        </div>
+        <canvas id="splashCanvas"></canvas>
     </div>
-    
-    <button id="menu-history">📜 History</button>
-    <div id="panel-history" class="menu-panel">
-        <p>
-            <button id="load3Days">📅 Load Last 3 Days</button>
-            <button id="summarizeNow">📝 Summarize Conversation</button>
-        </p>
+
+    <div id="app" class="app-shell" style="display:none;">
+        <aside class="sidebar" id="sideDrawer">
+            <div class="sidebar-header">
+                <button id="newChatBtn" class="new-chat-btn">＋ New chat</button>
+            </div>
+
+            <div class="sidebar-section">
+                <button id="menu-history" class="sidebar-btn">📜 History</button>
+                <div id="panel-history" class="menu-panel">
+                    <button id="load3Days">📅 Load Last 3 Days</button>
+                    <button id="summarizeNow">📝 Summarize Conversation</button>
+                    <button id="attach-btn">📎 Inject Memory JSON</button>
+                    <input type="file" id="attach-input" style="display:none;" accept=".json">
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <button id="menu-settings" class="sidebar-btn">⚙ Settings</button>
+                <div id="panel-settings" class="menu-panel">
+                    <label class="toggle-row" for="darkModeToggle">
+                        <span>Dark Mode</span>
+                        <input type="checkbox" id="darkModeToggle" checked>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-pane">
+            <header class="topbar">
+                <button id="menuToggle" class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+                <h1>Eloria</h1>
+            </header>
+
+            <section id="chat" class="chat-scroll"></section>
+
+            <footer class="composer-wrap">
+                <div class="composer-inner">
+                    <div id="input" contenteditable="true" class="composer" placeholder="Message Eloria..."></div>
+                    <button id="send" class="send-btn">Send</button>
+                </div>
+            </footer>
+        </main>
     </div>
-    
-    <button id="menu-prompts">💬 Prompts</button>
-    <div id="panel-prompts" class="menu-panel"><p>Prompts window content...</p></div>
-    
-    <button id="menu-memory">🧠 Memory</button>
-    <div id="panel-memory" class="menu-panel"><p>Memory window content...</p></div>
-    
-    <button id="menu-debug">🐞 Debug</button>
-    <div id="panel-debug" class="menu-panel"><p>Debug window content...</p></div>
 
-</div>
-
+    <script id="conversationData" type="application/json">{{ conversation | default([]) | tojson | safe }}</script>
 </body>
 </html>
