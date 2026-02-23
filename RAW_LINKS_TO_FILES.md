@@ -33,9 +33,19 @@ memory_summarizer.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/devel
 2026-02-17.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-17.json
 2026-02-18.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-18.json
 2026-02-19.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-19.json
+2026-02-20.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-20.json
+2026-02-21.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-21.json
+2026-02-22.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-22.json
+2026-02-23.json: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memories/2026-02-23.json
 
 # CSS Folder (Eloria/static/css)
 styles.css: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/static/css/styles.css
+
+# ICONS Folder (Eloria/static/icons)
+icons: https://github.com/Asgarth1977/Eloria/tree/development/static/icons
+
+# IMAGE Folder (Eloria/static/images)
+images: https://github.com/Asgarth1977/Eloria/tree/development/static/images
 
 # JS Folder (Eloria/static/js)
 app.js: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/static/js/app.js
