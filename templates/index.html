@@ -1,153 +1,50 @@
-<!-- Index.html file -->
-
+<!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Eloria AI Assistant</title>
-        <script src="{{ url_for('static', filename='js/memory.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Clone</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <!-- Logo doubles as toggle when collapsed -->
+            <div class="logo" id="sidebarLogo">🧠</div>
+            <button id="sidebarToggle"><img src="{{ url_for('static', filename='icons/iconName=sidebar.png') }}" alt="Attach"></img></button>
+        </div>
+        <div class="sidebar-content">
+            <button class="menu-btn"><span class="icon">🏠</span><span class="label">Home</span></button>
+            <button class="menu-btn"><span class="icon">💬</span><span class="label">Chats</span></button>
+            <button class="menu-btn"><span class="icon">📜</span><span class="label">History</span></button>
+            <button class="menu-btn"><span class="icon">🐞</span><span class="label">Debug</span></button>
+            <button class="menu-btn"><span class="icon">⚙️</span><span class="label">Settings</span></button>
+        </div>
+    </aside>
 
-<!-- Startup Splash -->
-<div id="startupSplash">
-    <div id="splashContent">
-        <div id="startupText"> Booting Eloria... </div>
-        <div id="progressContainer">
-            <div id="loadingProgress"></div>
+    <div class="main-area">
+        <header>
+            <span class="app-title">ChatGPT Clone</span>
+            <div class="header-buttons">
+                <button>GPT-4</button>
+                <button>Get Plus</button>
+                <button>Share</button>
+                <button>⋯</button>
+            </div>
+        </header>
+
+        <main id="chatBox">
+            <div class="message-area" id="messageArea"></div>
+        </main>
+
+        <div class="input-area">
+            <button class="attach-btn"><img src="{{ url_for('static', filename='icons/iconName=plus.png') }}" alt="Attach"></img></button>
+            <input type="text" id="userInput" placeholder="Type your message..." />
+            <button class="send-btn"><img src="{{ url_for('static', filename='icons/iconName=arrowUp.png') }}" alt="Send"></button>
         </div>
     </div>
-    <!-- Animated background dots -->
-    <canvas id="splashCanvas"></canvas>
-</div>
 
-
-    <div id="chat"></div>
-
-    <!-- Input area -->
-    <input type="file" id="attach-input" style="display:none;" accept=".json">
-    <div id="input-area">
-        <button id="attach-btn" title="Attach memory file">
-            <img src="{{ url_for('static', filename='icons/plus_2795.png') }}" alt="+">
-        </button>
-        <div id="input" contenteditable="true" placeholder="Type a message..."></div>
-        <button id="send">Send</button>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chat = document.getElementById('chat');
-            const input = document.getElementById('input');
-            const sendBtn = document.getElementById('send');
-
-        function formatTimestamp(ts) {
-            const dt = new Date(ts);
-            return dt.toLocaleString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-
-        function addMessage(text, sender, timestamp){
-            const div = document.createElement('div');
-            div.className = 'bubble ' + sender;
-            div.textContent = text;
-
-            const ts = document.createElement('div');
-            ts.className = 'timestamp';
-            ts.textContent = formatTimestamp(timestamp);
-
-            div.appendChild(ts);
-            chat.appendChild(div);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        function getInputText() {
-            return input.innerText;
-        }
-
-        async function sendMessage(){
-            const text = getInputText().trim();
-            if(!text) return;
-
-            const now = new Date().toISOString();
-            addMessage(text, 'user', now);
-            input.innerHTML = '';
-
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type':'application/json' },
-                body: JSON.stringify({ text })
-            });
-
-            const data = await res.json();
-            addMessage(data.response, 'ai', new Date().toISOString());
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // prevent newline
-                sendMessage();
-            }
-        });
-
-        // Load conversation history from Flask
-        const conversation = {{ conversation | default([]) | tojson | safe }};
-            for (const msg of conversation) {
-            const sender = msg.role === 'user' ? 'user' : 'ai';
-            addMessage(msg.content, sender, msg.timestamp);
-        }
-    });
-</script>
-
-    <!-- Menu Button -->
-<button id="menuToggle" class="menu-btn">☰</button>
-
-<!-- Overlay -->
-<div id="overlay" class="overlay"></div>
-
-<!-- Slide Drawer -->
-<div id="sideDrawer" class="drawer">
-    <h2>Eloria</h2>
-    <button id="menu-settings">⚙ Settings</button>
-    <div id="panel-settings" class="menu-panel">
-        <p>
-            <div class="setting-item">
-                <span>Dark Mode</span>
-                <label class="switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-        </p>
-    </div>
-    
-    <button id="menu-history">📜 History</button>
-    <div id="panel-history" class="menu-panel">
-        <p>
-            <button id="load3Days">📅 Load Last 3 Days</button>
-            <button id="summarizeNow">📝 Summarize Conversation</button>
-        </p>
-    </div>
-    
-    <button id="menu-prompts">💬 Prompts</button>
-    <div id="panel-prompts" class="menu-panel"><p>Prompts window content...</p></div>
-    
-    <button id="menu-memory">🧠 Memory</button>
-    <div id="panel-memory" class="menu-panel"><p>Memory window content...</p></div>
-    
-    <button id="menu-debug">🐞 Debug</button>
-    <div id="panel-debug" class="menu-panel"><p>Debug window content...</p></div>
-
-</div>
-
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

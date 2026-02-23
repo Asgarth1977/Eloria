@@ -1,410 +1,225 @@
-/*
-    This is the new stylesheet for Eloria. It is designed to be clean, modern, and responsive,
-    providing a better user experience across all devices.
-    The styles are organized into sections for easy maintenance and scalability.
-*/
+/* styles.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    html, body {
-        display:flex;
-        flex-direction:column;
-        background:#f0f0f0;
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* prevents scrollbars */
-        height: 100%;
-        width: 100%;
-        overflow-x: hidden;
-    }
-
-    #chat {
-        flex:1;
-        padding:10px;
-        overflow-y:auto;
-        display:flex;
-        flex-direction:column;
-    }
-
-    .bubble {
-        padding:10px 15px;
-        border-radius:20px;
-        margin:5px 0;
-        max-width:70%;
-        word-wrap:break-word;
-    }
-
-    .user {
-        background:#d1fcd3;
-        align-self:flex-end;
-        margin-left:auto;
-    }
-
-    .ai {
-        background:#ffffff;
-        align-self:flex-start;
-        margin-right:auto;
-    }
-
-    .timestamp {
-        font-size:10px;
-        color:#888;
-        margin-top:2px;
-    }
-
-    /* INPUT AREA */
-    #input-area {
-        display:flex;
-        padding:8px;
-        background:#eee;
-        border-top:1px solid #ccc;
-        gap:6px;
-    }
-
-    #input {
-        flex:1;
-        padding:10px;
-        font-size:14px;
-        border-radius:6px;
-        border:1px solid #ccc;
-    }
-
-    #send {
-        padding:10px 15px;
-        border:none;
-        background:#4CAF50;
-        color:white;
-        border-radius:6px;
-        cursor:pointer;
-        transition:background 0.15s ease;
-    }
-
-    #send:hover {
-        background:#45a049;
-    }
-
-    /* ATTACH BUTTON */
-    #attach-btn {
-        width:34px;
-        height:34px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        border:none;
-        background:transparent;
-        cursor:pointer;
-        border-radius:8px;
-        transition:background 0.15s ease;
-    }
-
-    #attach-btn:hover {
-        background:#e6e6e6;
-    }
-
-    #attach-btn img {
-        width:22px;
-        height:22px;
-        object-fit:contain;
-        pointer-events:none;
-    }
-
-    /* Menu Button */
-    .menu-btn {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        font-size: 24px;
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        z-index: 1001;
-    }
-
-    .accordion-btn {
-        width: 100%;
-        text-align: left;
-        padding: 10px;
-        margin: 5px 0;
-        background-color: #2c2c3e;
-        color: #fff;
-        border: none;
-        cursor: pointer;
-        outline: none;
-        border-radius: 4px;
-    }
-
-    /* Menu Panel */
-    .menu-panel {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        background-color: #2c2c3e;
-        margin-bottom: 5px;
-        padding: 0 10px; /* padding will expand when max-height increases */
-        border-radius: 4px;
-    }
-
-    /* Overlay */
-    .overlay {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.4);
-        top: 0;
-        left: 0;
-        opacity: 0;
-        visibility: hidden;
-        transition: 0.3s;
-        z-index: 1000;
-        display: none
-    }
-
-    /* Show overlay when active */
-    .overlay.show {
-        display: block;
-    }
-
-    /* Drawer */
-    .drawer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100vh;
-        background: #1e1e2f;
-        color: white;
-        padding: 20px;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Drawer Content */
-    .drawer.open {
-        transform: translateX(0);
-    }
-
-    .drawer h2 {
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .drawer button {
-        background: #2b2b2b;
-        border: none;
-        padding: 10px;
-        margin-bottom: 10px;
-        color: white;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: 0.2s;
-    }
-
-    .drawer button:hover {
-        background: #3a3a3a;
-    }
-
-    /* Active State */
-    .drawer.active {
-        transform: translateX(0);
-    }
-
-    .overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    body.drawer-open {
-        overflow: hidden;
-    }
-
-    .drawer-panel {
-        display: none; /* Hidden by default */
-        padding: 10px 15px;
-        background-color: var(--input-bg);
-        border-top: 1px solid #ccc;
-    }
-
-    .drawer-btn.active + .drawer-panel {
-        display: block; /* Show panel when button is active */
-    }
-
-
-/* Splash Screen */
-#startupSplash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #111;
+    color: #fff;
     height: 100vh;
-    background: black;
-    z-index: 9999;
-}
-
-#splashCanvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1; /* matrix letters behind */
-}
-
-#splashContent {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    z-index: 3; /* text above canvas */
-}
-
-#splashContent::before {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: -20px;
-    right: -20px;
-    bottom: -10px;
-    background: rgba(0, 0, 0, 0.3); /* semi-transparent black */
-    border-radius: 8px;
-    z-index: 1; /* below text but above canvas */
-}
-
-#loadingProgressContainer {
-    position: relative;
-    width: 320px;
-    height: 10px;
-    background: rgba(0, 255, 0, 0.1);
-    border-radius: 6px;
     overflow: hidden;
 }
 
-#loadingProgress {
-    position: relative;
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        #003300 0%,
-        #00ff00 50%,
-        #003300 100%
-    );
-    box-shadow: 0 0 10px #00ff00;
-    border-radius: 6px;
-    transition: width 0.2s ease-out;
+/* Sidebar */
+#sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #202123, #2a2b32);
+    position: fixed; top: 0; left: 0; height: 100%;
+    transition: width 0.3s ease-in-out;
+    display: flex; flex-direction: column; z-index: 100;
+    overflow: hidden;
 }
 
-/* Moving bright scan line */
-#loadingProgress::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: -20px;
-    width: 20px;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.4);
-    filter: blur(4px);
-}
-
-
-#startupText {
-    color: #00ff00;
-    font-family: monospace;
-    font-size: 22px;
-    text-align: center;
-    z-index: 2; /* make sure above canvas */
-    
-    /* initial glow */
-    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00;
-    
-    /* pulse animation */
-    animation: pulseGlow 2.5s infinite alternate;
-}
-
-@keyframes pulseGlow {
-    from {
-        text-shadow: 
-            0 0 5px #00ff00,
-            0 0 10px #00ff00,
-            0 0 20px #00ff00,
-            0 0 30px #00ff00;
-    }
-    to {
-        text-shadow: 
-            0 0 10px #00ff00,
-            0 0 20px #00ff00,
-            0 0 30px #00ff00,
-            0 0 50px #00ff00;
-    }
-}
-
-    /* Dark Mode styles */
-    body.dark-mode {
-        background-color: #1a1a28;
-        color: #e0e0e0;
-    }
-
-    /* Optional: invert drawer colors for dark mode */
-    body.dark-mode .drawer {
-        background-color: #12121f;
-        color: #fff;
-    }
-
-.setting-item {
+/* Sidebar Header */
+.sidebar-header { 
     display: flex;
-    justify-content: space-between; /* pushes text left, toggle right */
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    padding: 12px 8px;
+    background: #212121;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+    z-index: 10;
+    flex-wrap: nowrap;
+    border-radius: 12px 12px 0 0;
 }
 
-/* Toggle container remains mostly the same */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px; /* increased from 60px to fit right icon */
-    height: 24px;
+/* Logo becomes toggle when collapsed */
+.sidebar-header .logo { cursor: pointer; transition: transform 0.3s; }
+.sidebar-header button { background: none; border: none; color: #fff; cursor: pointer; transition: transform 0.3s; }
+
+/* Hide text spans when collapsed */
+.sidebar-header span { transition: opacity 0.3s; }
+
+/* Sidebar Collapsed State */
+#sidebar.collapsed { width: 50px; }
+#sidebar.collapsed .sidebar-header button { opacity: 0; pointer-events: none; }
+#sidebar.collapsed .sidebar-header span { opacity: 0; pointer-events: none; }
+
+/* Sidebar Menu Buttons */
+#sidebar.collapsed .menu-btn .label { opacity: 0; }
+#sidebar.collapsed .menu-btn .icon { margin-right: -50px; }
+
+/* Sidebar Main Area Adjustments */
+#sidebar.collapsed ~ .main-area .input-area { left: 50px; width: calc(100% - 50px); }
+#sidebar.collapsed ~ .main-area { margin-left: 50px; }
+
+/* Sidebar menu buttons */
+.sidebar-content {
+    flex-grow: 1;
+    padding: 6px 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0; /* Fixes flexbox overflow issues */
+    align-items: left;
 }
 
-/* Hide checkbox */
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* Slider */
-.slider {
-    position: absolute;
+.menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: #fff;
+    border-radius: 6px;
     cursor: pointer;
-    top: 0; left: 0;
-    right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 24px;
+    transition: background 0.2s;
 }
+.menu-btn:hover { background-color: #4b8bff; }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.4s;
+.send-btn {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    border: none;
+    background: #2a2b32;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
 }
 
-/* Checked state */
-input:checked + .slider {
-    background-color: #2196F3;
+.send-btn:hover {
+    background: #3a3b42;
 }
 
-input:checked + .slider:before {
-    transform: translateX(26px);
+.attach-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #2a2b32;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.attach-btn:hover {
+    background: #3a3b42;
+}
+
+/* Input area */
+.input-area {
+    position: fixed;
+    bottom: 0;
+    left: 280px;
+    right: 0;
+    width: calc(100% - 280px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #333;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.5);
+    border-radius: 12px 12px 0 0;
+    transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+/* Main area adjusts with sidebar */
+.main-area {
+    margin-left: 280px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px;
+    background: #212121;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+    z-index: 10;
+    flex-wrap: nowrap;
+    border-radius: 1px;
+}
+
+
+.header-buttons button {
+    margin-left: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #2c2c33;
+    color: #fff;
+    transition: background 0.3s;
+}
+
+.header-buttons button:hover {
+    background: linear-gradient(90deg, #4b8bff, #3570d6);
+}
+
+/* Main chat */
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    background: #212121;
+    overflow-y: auto;
+}
+.message-area {
+    flex-grow: 1;
+    padding-bottom: 80px;
+}
+.message { display: flex; margin: 6px 0; align-items: flex-end; }
+.user-message { justify-content: flex-end; text-align: right; }
+.user-bubble {
+    background: linear-gradient(90deg, #4b8bff, #3570d6);
+    color: #fff;
+    padding: 12px;
+    border-radius: 12px 12px 0 12px;
+    max-width: 600px;
+    word-break: break-word;
+}
+.ai-message { justify-content: flex-start; text-align: left; }
+.ai-bubble {
+    background: linear-gradient(90deg, #2a2b32, #1f1f23);
+    color: #fff;
+    padding: 12px;
+    border-radius: 12px 12px 12px 0;
+    max-width: 600px;
+    word-break: break-word;
+}
+
+#userInput {
+    flex-grow: 1;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin-right: 8px;
+    background: linear-gradient(180deg, #1e1e1e, #121212);
+    color: #fff;
 }

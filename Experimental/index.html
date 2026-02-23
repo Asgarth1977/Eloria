@@ -1,0 +1,51 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eloria Experimental UI</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/menu.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <div class="app-icon">🟢</div>
+        <button class="menu-toggle" aria-label="Toggle sidebar">☰</button>
+        <h1>Eloria</h1>
+    </header>
+
+    <aside id="sideDrawer" class="sidebar">
+        <button class="sidebar-collapse-btn">×</button>
+
+        <div class="sidebar-section">
+            <button id="menu-history" class="sidebar-btn">📜 History</button>
+            <div id="panel-history" class="menu-panel">
+                <button>Load Last 3 Days</button>
+                <button>Summarize Conversation</button>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <button id="menu-settings" class="sidebar-btn">⚙ Settings</button>
+            <div id="panel-settings" class="menu-panel">
+                <label class="toggle-row">
+                    <span>Dark Mode</span>
+                    <input type="checkbox" id="darkModeToggle" checked>
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-pane">
+        <section id="chat" class="chat-scroll"></section>
+
+        <footer class="composer-wrap">
+            <div class="composer-inner">
+                <div id="input" class="composer" contenteditable="true" placeholder="Message Eloria..."></div>
+                <button id="send" class="send-btn">Send</button>
+            </div>
+        </footer>
+    </main>
+</body>
+</html>

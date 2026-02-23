@@ -56,6 +56,12 @@ Eloria is designed as a **free personal AI assistant** that grows under controll
 
 ---
 
+## Icons
+
+Icons by Mohammed Waleed, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+
+---
+
 ## Contact
 
 For questions or collaboration requests:

@@ -22,7 +22,7 @@ memory_manager = MemoryManager()
 # MemoryWatcher is already started inside MemoryManager.__init__()
 
 # Register routes
-register_routes(app, memory_manager)
+register_routes(app)
 
 def start_flask():
     app.run(port=5000)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     threading.Thread(target=start_flask, daemon=True).start()
     
     # Start desktop WebView window
-    webview.create_window("Eloria Local AI", "http://127.0.0.1:5000", width=500, height=900)
+    webview.create_window("Eloria Local AI", "http://127.0.0.1:5000", width=1200, height=800)
     
     # Keep the script alive while the window is open
     webview.start()  # <-- this blocks until the window is closed
