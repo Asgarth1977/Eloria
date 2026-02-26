@@ -29,6 +29,10 @@ MODELS = {
         "model_name": "mistralai/ministral-3-14b-reasoning",
         "id": "eloria-voice"
     },
+    "Q": {
+        "model_name": "qwen/qwen2.5-coder-14b",
+        "id": "q-voice"
+    },
 }
 
 # -------------------------------

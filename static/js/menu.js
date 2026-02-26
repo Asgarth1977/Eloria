@@ -1,74 +1,38 @@
+// menu.js
 document.addEventListener("DOMContentLoaded", () => {
-    const sidebar = document.getElementById("sideDrawer");
-    const toggleBtn = document.querySelector(".topbar .menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("sidebarToggle");
+    const logo = document.querySelector("#sidebar .logo");
 
-    // Hamburger toggle
-    if (toggleBtn) {
-        toggleBtn.addEventListener("click", (e) => {
-            e.stopPropagation(); // prevent document click
-            sidebar.classList.toggle("open");
-        });
+    if (!sidebar) return;
+
+    function toggleSidebar(){
+        sidebar.classList.toggle("collapsed");
     }
 
-    // Add × button inside sidebar if missing
-    let collapseBtn = sidebar.querySelector(".sidebar-collapse-btn");
-    if (!collapseBtn) {
-        collapseBtn = document.createElement("button");
-        collapseBtn.className = "sidebar-collapse-btn";
-        collapseBtn.textContent = "×";
-        sidebar.prepend(collapseBtn);
+    if (toggleBtn){
+        toggleBtn.addEventListener("click", toggleSidebar);
     }
 
-    collapseBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        sidebar.classList.remove("open");
-    });
+    if (logo){
+        logo.addEventListener("click", toggleSidebar);
+    }
 
-    // Click outside sidebar to close
-    document.addEventListener("click", (e) => {
-        if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-            sidebar.classList.remove("open");
-        }
-    });
-
-    // Stop clicks inside sidebar from bubbling up
+    // Stop clicks inside sidebar from closing
     sidebar.addEventListener("click", (e) => e.stopPropagation());
 
-    // Accordion panels
-    const panels = document.querySelectorAll(".menu-panel");
-    document.querySelectorAll(".sidebar-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const panelId = btn.id.replace("menu-", "panel-");
-            const panel = document.getElementById(panelId);
-
-            panels.forEach(p => {
-                if (p !== panel) p.classList.remove("open");
-            });
-
-            if (panel) panel.classList.toggle("open");
-        });
-    });
-
-    // DARK MODE TOGGLE
-    const darkToggle = document.getElementById("darkModeToggle");
-    if (darkToggle) {
-        const savedMode = localStorage.getItem("darkMode");
-        if (savedMode === "enabled") {
-            document.body.classList.add("dark-mode");
-            darkToggle.checked = true;
-        } else {
-            document.body.classList.remove("dark-mode");
-            darkToggle.checked = false;
-        }
-
-        darkToggle.addEventListener("change", () => {
-            if (darkToggle.checked) {
-                document.body.classList.add("dark-mode");
-                localStorage.setItem("darkMode", "enabled");
-            } else {
-                document.body.classList.remove("dark-mode");
-                localStorage.setItem("darkMode", "disabled");
-            }
+    // History button placeholder: attach fetch to 3-day messages
+    const historyBtn = document.getElementById("btn-history");
+    if (historyBtn) {
+        historyBtn.addEventListener("click", async () => {
+            try {
+                const res = await fetch("/load_3_days", { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    console.log("3-day history:", data.messages);
+                    // TODO: display in chat
+                } else console.error(data.error);
+            } catch (err) { console.error(err); }
         });
     }
 });

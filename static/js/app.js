@@ -1,52 +1,82 @@
-// app.js
 document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.getElementById('sidebar');
-    const toggle = document.getElementById('sidebarToggle');
-    const mainContainer = document.querySelector('.main-container');
-    const sendButton = document.getElementById('sendButton');
-    const userInput = document.getElementById('userInput');
-    const messageArea = document.getElementById('messageArea');
-    const logo = document.getElementById('sidebarLogo');
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+    const sendButton = document.querySelector('.send-btn');
 
-    toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        mainContainer.classList.toggle('shifted');
-    });
-        // Both the button and the logo can toggle
-    toggle.addEventListener('click', toggleSidebar);
-    logo.addEventListener('click', toggleSidebar);    
-    function toggleSidebar() {
-        sidebar.classList.toggle('collapsed');
+    // --- Load previous conversation if Flask passes it ---
+    const conversation = window.conversation || [];  // optionally pass via template
+    for (const msg of conversation) {
+        const sender = msg.role === 'user' ? 'user' : 'ai';
+        appendMessage(msg.content, sender, msg.timestamp);
     }
-    
 
+    // --- Send button ---
     sendButton.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
     });
 
-    function sendMessage() {
-        const text = userInput.value.trim();
-        if (!text) return;
-        appendMessage(text, 'user');
-        userInput.value = '';
-
-        setTimeout(() => {
-            appendMessage('AI Response', 'ai');
-        }, 1000);
+    // --- Helper: timestamp formatting ---
+    function formatTimestamp(ts) {
+        const dt = new Date(ts);
+        return dt.toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
     }
 
-    function appendMessage(text, type) {
+    // --- Append message to chat ---
+    function appendMessage(text, sender, timestamp = new Date().toISOString()) {
         const div = document.createElement('div');
-        div.classList.add('message', `${type}-message`);
+        div.classList.add('message', sender + '-message');
+
         const bubble = document.createElement('div');
-        bubble.classList.add(`${type}-bubble`);
+        bubble.classList.add(sender + '-bubble');
         bubble.textContent = text;
+
+        const tsDiv = document.createElement('div');
+        tsDiv.className = 'timestamp';
+        tsDiv.textContent = formatTimestamp(timestamp);
+
+        bubble.appendChild(tsDiv);
         div.appendChild(bubble);
-        messageArea.appendChild(div);
-        messageArea.scrollTop = messageArea.scrollHeight;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    // --- Send message to backend ---
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage(text, 'user');  // display immediately
+        input.value = '';
+
+        /*
+        // For now: mock AI response (remove later when memory manager integrated)
+        setTimeout(() => {
+            appendMessage("AI response placeholder", 'ai');
+        }, 500);
+
+        // Later: send to Flask
+        */
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await res.json();
+            appendMessage(data.response, 'ai');
+        } catch (err) {
+            appendMessage("Error: Could not reach server.", 'ai');
+            console.error(err);
+        }
     }
 });

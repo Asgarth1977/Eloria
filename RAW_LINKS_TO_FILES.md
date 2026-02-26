@@ -20,7 +20,7 @@ llm_client.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/
 __init__.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/__init__.py
 memory_core.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory.py
 memory_watcher.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory_watcher.py
-memory_manager.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory_managerr.py
+memory_manager.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory_manager.py
 memory_summarizer.py: https://github.com/Asgarth1977/Eloria/raw/refs/heads/development/memory/memory_summarizer.py
 
 # Memory Folder (Eloria/memory/memories)
