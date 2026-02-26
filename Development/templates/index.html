@@ -1,0 +1,79 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+<aside id="sidebar" class="collapsed">
+    <div class="sidebar-header">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo-1.png') }}" alt="Logo">
+        </div>
+        <span class="sidebar-title">Project Grimlock</span>
+        <button id="sidebarToggle">
+            <img src="{{ url_for('static', filename='icons/iconName=sidebar.png') }}" alt="Toggle">
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+        <button class="menu-btn" id="btn-new-chat">
+            <span class="icon"><img src="{{ url_for('static', filename='icons/iconName=newChat.png') }}"></span>
+            <span class="label">New Chat</span>
+        </button>
+
+        <button class="menu-btn" id="btn-history">
+            <span class="icon"><img src="{{ url_for('static', filename='icons/iconName=conversations.png') }}"></span>
+            <span class="label">History</span>
+        </button>
+
+        <button class="menu-btn" id="btn-apps">
+            <span class="icon"><img src="{{ url_for('static', filename='icons/iconName=apps.png') }}"></span>
+            <span class="label">Debug</span>
+        </button>
+
+        <button class="menu-btn" id="btn-settings">
+            <span class="icon"><img src="{{ url_for('static', filename='icons/iconName=settings.png') }}"></span>
+            <span class="label">Settings</span>
+        </button>
+    </div>
+</aside>
+
+<div class="main-area">
+    <header>
+        <div class="header-buttons">
+            <button class="menu-btn">
+                <img src="{{ url_for('static', filename='icons/iconName=upload.png') }}" alt="Share">
+                <span>Share</span>
+            </button>
+
+            <button class="menu-btn">
+                <img src="{{ url_for('static', filename='icons/iconName=more.png') }}" alt="More">
+            </button>
+        </div>
+    </header>
+
+    <main id="chatBox">
+        <div id="chat"></div>
+    </main>
+
+    <div class="input-area">
+        <button class="attach-btn"><img src="{{ url_for('static', filename='icons/iconName=plus.png') }}" alt="+"></button>
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button class="mic-btn"><img src="{{ url_for('static', filename='icons/iconName=mic.png') }}" alt="Mic"></button>
+        <button class="send-btn"><img src="{{ url_for('static', filename='icons/iconName=arrowUp.png') }}" alt="Send"></button>
+    </div>
+</div>
+
+<script>
+    window.conversation = {{ conversation | tojson | safe }};
+</script>
+<script src="{{ url_for('static', filename='js/memory.js') }}"></script>
+<script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
