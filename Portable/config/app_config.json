@@ -1,0 +1,6 @@
+{
+    "lm_studio_host": "127.0.0.1",
+    "lm_studio_port": 7860,
+    "memory_path": "F:\\Local AI\\Project\\Portable\\memory",
+    "logs_path": "F:\\Local AI\\Project\\Portable\\logs"
+}
